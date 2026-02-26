@@ -68,9 +68,10 @@ function overrideGlobalMomentWeekStart(weekStart: IWeekStartOption): void {
       week: window._bundledLocaleWeekSpec,
     });
   } else {
+    const idx = weekdays.indexOf(weekStart);
     moment.updateLocale(currentLocale, {
       week: {
-        dow: weekdays.indexOf(weekStart) || 0,
+        dow: idx < 0 ? 0 : idx,
       },
     });
   }

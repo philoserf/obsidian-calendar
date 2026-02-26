@@ -28,10 +28,12 @@ function join(...partSegments: string[]): string {
 async function ensureFolderExists(path: string): Promise<void> {
   const dirs = path.replace(/\\/g, "/").split("/");
   dirs.pop();
-  if (dirs.length) {
-    const dir = join(...dirs);
-    if (!window.app.vault.getAbstractFileByPath(dir)) {
-      await window.app.vault.createFolder(dir);
+  let current = "";
+  for (const segment of dirs) {
+    if (!segment) continue;
+    current = current ? `${current}/${segment}` : segment;
+    if (!window.app.vault.getAbstractFileByPath(current)) {
+      await window.app.vault.createFolder(current);
     }
   }
 }
@@ -51,6 +53,7 @@ async function getNotePath(
 
 async function getTemplateInfo(
   template: string,
+  noteType = "daily",
 ): Promise<[string, Record<string, unknown> | null]> {
   const { metadataCache, vault } = window.app;
   const templatePath = normalizePath(template);
@@ -68,10 +71,10 @@ async function getTemplateInfo(
     return [contents, foldInfo];
   } catch (err) {
     console.error(
-      `Failed to read the daily note template '${templatePath}'`,
+      `Failed to read the ${noteType} note template '${templatePath}'`,
       err,
     );
-    new Notice("Failed to read the daily note template");
+    new Notice(`Failed to read the ${noteType} note template`);
     return ["", null];
   }
 }
@@ -80,7 +83,10 @@ export async function createDailyNote(date: Moment): Promise<TFile> {
   const { vault } = window.app;
   const { moment } = window;
   const { template, format, folder } = getDailyNoteSettings();
-  const [templateContents, foldInfo] = await getTemplateInfo(template ?? "");
+  const [templateContents, foldInfo] = await getTemplateInfo(
+    template ?? "",
+    "daily",
+  );
   const fmt = format || "YYYY-MM-DD";
   const filename = date.format(fmt);
   const normalizedPath = await getNotePath(folder ?? "", filename);
@@ -153,7 +159,10 @@ function getDayOfWeekNumericalValue(dayOfWeekName: string): number {
 export async function createWeeklyNote(date: Moment): Promise<TFile> {
   const { vault } = window.app;
   const { template, format, folder } = getWeeklyNoteSettings();
-  const [templateContents, foldInfo] = await getTemplateInfo(template ?? "");
+  const [templateContents, foldInfo] = await getTemplateInfo(
+    template ?? "",
+    "weekly",
+  );
   const fmt = format || "gggg-[W]ww";
   const filename = date.format(fmt);
   const normalizedPath = await getNotePath(folder ?? "", filename);

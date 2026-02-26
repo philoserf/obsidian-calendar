@@ -1,5 +1,5 @@
 import { Plugin, type WorkspaceLeaf } from "obsidian";
-
+import { configureGlobalMomentLocale } from "./components/localization";
 import { VIEW_TYPE_CALENDAR } from "./constants";
 import { tryToCreateWeeklyNote } from "./io/notes";
 import {
@@ -59,10 +59,18 @@ export default class CalendarPlugin extends Plugin {
     this.addCommand({
       id: "reveal-active-note",
       name: "Reveal active note",
-      callback: () => this.view.revealActiveNote(),
+      checkCallback: (checking: boolean) => {
+        if (!this.view) return false;
+        if (!checking) this.view.revealActiveNote();
+        return true;
+      },
     });
 
     await this.loadOptions();
+    configureGlobalMomentLocale(
+      this.options.localeOverride,
+      this.options.weekStart,
+    );
 
     this.addSettingTab(new CalendarSettingsTab(this.app, this));
 

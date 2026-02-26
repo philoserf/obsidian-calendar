@@ -15,7 +15,7 @@ export default defineConfig({
       formats: ["cjs"],
       fileName: () => "main.js",
     },
-    sourcemap: process.env.NODE_ENV === "DEV" ? "inline" : false,
+    sourcemap: process.env.NODE_ENV === "development" ? "inline" : false,
     rollupOptions: {
       external: ["obsidian", "fs", "os", "path"],
       output: {

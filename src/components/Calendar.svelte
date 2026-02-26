@@ -1,14 +1,14 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { Plugin } from "obsidian";
-  import { onDestroy, setContext } from "svelte";
+  import { setContext } from "svelte";
   import { get, writable } from "svelte/store";
 
   import type { ISettings } from "src/settings";
   import { activeFile, settings } from "../stores";
   import { DISPLAYED_MONTH } from "./context";
   import Day from "./Day.svelte";
-  import PeriodicNotesCache from "./fileStore";
+  import type PeriodicNotesCache from "./fileStore";
   import { configureGlobalMomentLocale } from "./localization";
   import Nav from "./Nav.svelte";
   import type { ICalendarSource, IEventHandlers, IMonth, ISourceSettings } from "./types";
@@ -18,12 +18,14 @@
   // Props from view.ts
   let {
     plugin,
+    fileCache,
     sources = [],
     onHover,
     onClick,
     onContextMenu,
   }: {
     plugin: Plugin;
+    fileCache: PeriodicNotesCache;
     sources?: ICalendarSource[];
     onHover: IEventHandlers["onHover"];
     onClick: IEventHandlers["onClick"];
@@ -42,15 +44,9 @@
   let selectedId = $derived($activeFile);
   let eventHandlers: IEventHandlers = $derived({ onHover, onClick, onContextMenu });
 
-  let month: IMonth = $derived.by(() => {
-    today;
-    return getMonth($displayedMonthStore);
-  });
-
-  let daysOfWeek: string[] = $derived.by(() => {
-    today;
-    return getDaysOfWeek();
-  });
+  // Pass `today` explicitly so the derived blocks re-evaluate when locale changes
+  let month: IMonth = $derived.by(() => getMonth($displayedMonthStore, today));
+  let daysOfWeek: string[] = $derived.by(() => getDaysOfWeek(today));
 
   // Public API for view.ts
   export function tick() {
@@ -66,6 +62,7 @@
     return window.moment();
   }
 
+  // sourceId-based settings not yet persisted; all sources share defaults for now
   function getSourceSettings(_sourceId: string): ISourceSettings {
     return {
       color: "default",
@@ -74,22 +71,25 @@
     };
   }
 
-  // Heartbeat: update today every 60s, sync displayed month if viewing current
+  // Heartbeat: update today every 60s; auto-advance displayed month if the user
+  // was viewing the current month when the month boundary crossed.
   let heartbeat = setInterval(() => {
+    const prevToday = today;
     tick();
-    if (get(displayedMonthStore).isSame(today, "day")) {
-      displayedMonthStore.set(today);
+    if (!prevToday.isSame(today, "month")) {
+      if (get(displayedMonthStore).isSame(prevToday, "month")) {
+        displayedMonthStore.set(today);
+      }
     }
   }, 1000 * 60);
 
+  import { onDestroy } from "svelte";
   onDestroy(() => {
     clearInterval(heartbeat);
   });
 
-  let displayedMonthStore = writable<Moment>(today);
+  let displayedMonthStore = writable<Moment>(window.moment());
   setContext(DISPLAYED_MONTH, displayedMonthStore);
-
-  const fileCache = new PeriodicNotesCache(plugin, sources);
 </script>
 
 <div id="calendar-container" class="container">

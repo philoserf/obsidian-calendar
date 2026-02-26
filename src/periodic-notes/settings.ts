@@ -162,12 +162,14 @@ export function appHasDailyNotesPluginLoaded(): boolean {
 
 export function appHasWeeklyNotesPluginLoaded(): boolean {
   const { app } = window;
-  if (app.plugins.getPlugin("calendar")) {
-    return true;
-  }
   const periodicNotes = app.plugins.getPlugin("periodic-notes");
   // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-  return !!(periodicNotes && (periodicNotes as any).settings?.weekly?.enabled);
+  if (periodicNotes && (periodicNotes as any).settings?.weekly?.enabled) {
+    return true;
+  }
+  const calendar = app.plugins.getPlugin("calendar");
+  // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
+  return !!(calendar as any)?.options?.showWeeklyNote;
 }
 
 export function appHasMonthlyNotesPluginLoaded(): boolean {

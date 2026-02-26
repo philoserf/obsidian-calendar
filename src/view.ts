@@ -1,16 +1,11 @@
 import type { Moment } from "moment";
-import {
-  FileView,
-  ItemView,
-  type Plugin,
-  type TFile,
-  type WorkspaceLeaf,
-} from "obsidian";
-import { TRIGGER_ON_OPEN, VIEW_TYPE_CALENDAR } from "src/constants";
+import { ItemView, type TFile, type WorkspaceLeaf } from "obsidian";
+import { PLUGIN_ID, TRIGGER_ON_OPEN, VIEW_TYPE_CALENDAR } from "src/constants";
 import { tryToCreateDailyNote, tryToCreateWeeklyNote } from "src/io/notes";
 import type { ISettings } from "src/settings";
 import { mount, unmount } from "svelte";
 import Calendar from "./components/Calendar.svelte";
+import PeriodicNotesCache from "./components/fileStore";
 import { showFileMenu } from "./fileMenu";
 import {
   getDateFromFile,
@@ -36,12 +31,14 @@ export default class CalendarView extends ItemView {
       this.app.workspace.on("file-open", this.onFileOpen.bind(this)),
     );
 
-    settings.subscribe((val) => {
-      this.settings = val;
-      if (this.calendar) {
-        this.calendar.tick();
-      }
-    });
+    this.register(
+      settings.subscribe((val) => {
+        this.settings = val;
+        if (this.calendar) {
+          this.calendar.tick();
+        }
+      }),
+    );
   }
 
   getViewType(): string {
@@ -67,13 +64,17 @@ export default class CalendarView extends ItemView {
     const sources = [wordCountSource];
     this.app.workspace.trigger(TRIGGER_ON_OPEN, sources);
 
+    const fileCache = new PeriodicNotesCache(this, sources);
+
     this.calendar = mount(Calendar, {
       // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
       target: (this as any).contentEl,
       props: {
         plugin:
-          this.app.plugins.getPlugin(this.getViewType()) ??
-          (this as unknown as Plugin),
+          this.app.plugins.getPlugin(PLUGIN_ID) ??
+          // biome-ignore lint/suspicious/noExplicitAny: fallback when manifest ID diverges from view type
+          (this as unknown as any),
+        fileCache,
         sources,
         onHover: this.onHover.bind(this),
         onClick: this.onClick.bind(this),
@@ -158,14 +159,7 @@ export default class CalendarView extends ItemView {
   }
 
   private updateActiveFile(): void {
-    const activeLeaf = this.app.workspace.activeLeaf;
-    if (!activeLeaf) return;
-    const { view } = activeLeaf;
-
-    let file = null;
-    if (view instanceof FileView) {
-      file = view.file;
-    }
+    const file = this.app.workspace.getActiveFile();
     activeFile.setFile(file);
 
     if (this.calendar) {
@@ -175,25 +169,19 @@ export default class CalendarView extends ItemView {
 
   public revealActiveNote(): void {
     const { moment } = window;
-    const activeLeaf = this.app.workspace.activeLeaf;
-    if (!activeLeaf) return;
+    const file = this.app.workspace.getActiveFile();
+    if (!file) return;
 
-    if (activeLeaf.view instanceof FileView) {
-      const file = activeLeaf.view.file;
-      if (!file) return;
+    let date = getDateFromFile(file, "day");
+    if (date) {
+      this.calendar.setDisplayedMonth(date);
+      return;
+    }
 
-      let date = getDateFromFile(file, "day");
-      if (date) {
-        this.calendar.setDisplayedMonth(date);
-        return;
-      }
-
-      const { format } = getWeeklyNoteSettings();
-      date = moment(file.basename, format, true);
-      if (date.isValid()) {
-        this.calendar.setDisplayedMonth(date);
-        return;
-      }
+    const { format } = getWeeklyNoteSettings();
+    date = moment(file.basename, format, true);
+    if (date.isValid()) {
+      this.calendar.setDisplayedMonth(date);
     }
   }
 }

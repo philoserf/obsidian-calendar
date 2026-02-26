@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import type { TFile } from "obsidian";
-  import { getContext, onDestroy } from "svelte";
+  import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
   import {
     appHasMonthlyNotesPluginLoaded,
@@ -49,21 +49,29 @@
 
   let displayedMonth = getContext<Writable<Moment>>(DISPLAYED_MONTH);
   let metadata: Promise<IDayMetadata[]> | null = $state(null);
-
   let file: TFile | null = $state(null);
-  function getMetadata() {
-    file = fileCache.getFile($displayedMonth, "month");
-    metadata = fileCache.getEvaluatedMetadata(
-      "month",
-      $displayedMonth,
-      getSourceSettings,
-    );
-  }
-  const unsubFileCache = fileCache.store.subscribe(getMetadata);
-  const unsubDisplayedMonth = displayedMonth.subscribe(getMetadata);
-  onDestroy(() => {
-    unsubFileCache();
-    unsubDisplayedMonth();
+
+  $effect(() => {
+    const unsub1 = fileCache.store.subscribe(() => {
+      file = fileCache.getFile($displayedMonth, "month");
+      metadata = fileCache.getEvaluatedMetadata(
+        "month",
+        $displayedMonth,
+        getSourceSettings,
+      );
+    });
+    const unsub2 = displayedMonth.subscribe(() => {
+      file = fileCache.getFile($displayedMonth, "month");
+      metadata = fileCache.getEvaluatedMetadata(
+        "month",
+        $displayedMonth,
+        getSourceSettings,
+      );
+    });
+    return () => {
+      unsub1();
+      unsub2();
+    };
   });
 
   function handleHover(event: PointerEvent) {
@@ -91,7 +99,7 @@
     <div
       role="button"
       tabindex="0"
-      draggable={true}
+      draggable={!!file}
       onclick={handleClick}
       onkeydown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
