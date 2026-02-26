@@ -1,5 +1,5 @@
 import type { Moment } from "moment";
-import { type App, type Plugin, type TAbstractFile, TFile } from "obsidian";
+import { type App, type Component, type TAbstractFile, TFile } from "obsidian";
 import type { Writable } from "svelte/store";
 import { get, writable } from "svelte/store";
 import {
@@ -47,26 +47,26 @@ export default class PeriodicNotesCache {
   public store: Writable<Record<PeriodicNoteID, TFile>>;
   private sources: ICalendarSource[];
 
-  constructor(plugin: Plugin, sources: ICalendarSource[]) {
-    this.app = plugin.app;
+  constructor(component: Component & { app: App }, sources: ICalendarSource[]) {
+    this.app = component.app;
     this.sources = sources;
     this.store = writable<Record<PeriodicNoteID, TFile>>({});
 
-    plugin.app.workspace.onLayoutReady(() => {
+    this.app.workspace.onLayoutReady(() => {
       const { vault } = this.app;
-      plugin.registerEvent(vault.on("create", this.onFileCreated, this));
-      plugin.registerEvent(vault.on("delete", this.onFileDeleted, this));
-      plugin.registerEvent(vault.on("rename", this.onFileRenamed, this));
-      plugin.registerEvent(vault.on("modify", this.onFileModified, this));
+      component.registerEvent(vault.on("create", this.onFileCreated, this));
+      component.registerEvent(vault.on("delete", this.onFileDeleted, this));
+      component.registerEvent(vault.on("rename", this.onFileRenamed, this));
+      component.registerEvent(vault.on("modify", this.onFileModified, this));
       this.initialize();
     });
 
     // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
     const workspace = this.app.workspace as any;
-    plugin.registerEvent(
+    component.registerEvent(
       workspace.on("periodic-notes:settings-updated", this.initialize, this),
     );
-    plugin.registerEvent(
+    component.registerEvent(
       workspace.on("calendar:metadata-updated", this.initialize, this),
     );
   }

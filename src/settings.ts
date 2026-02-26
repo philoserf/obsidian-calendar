@@ -38,7 +38,7 @@ export const defaultSettings = Object.freeze({
 export function appHasPeriodicNotesPluginLoaded(): boolean {
   // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
   const periodicNotes = (<any>window.app).plugins.getPlugin("periodic-notes");
-  return periodicNotes?.settings?.weekly?.enabled;
+  return !!periodicNotes?.settings?.weekly?.enabled;
 }
 
 export class CalendarSettingsTab extends PluginSettingTab {
@@ -103,8 +103,10 @@ export class CalendarSettingsTab extends PluginSettingTab {
         textfield.inputEl.type = "number";
         textfield.setValue(String(this.plugin.options.wordsPerDot));
         textfield.onChange(async (value) => {
+          const n = Number(value);
           this.plugin.writeOptions(() => ({
-            wordsPerDot: value !== "" ? Number(value) : undefined,
+            wordsPerDot:
+              Number.isFinite(n) && n > 0 ? n : DEFAULT_WORDS_PER_DOT,
           }));
         });
       });

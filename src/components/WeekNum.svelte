@@ -2,7 +2,6 @@
   import type { Moment } from "moment";
   import type { TFile } from "obsidian";
   import { type IGranularity, getDateUID } from "../periodic-notes";
-  import { onDestroy } from "svelte";
   import Dots from "./Dots.svelte";
   import type PeriodicNotesCache from "./fileStore";
   import MetadataResolver from "./MetadataResolver.svelte";
@@ -49,15 +48,16 @@
   let metadata: Promise<IDayMetadata[]> | null = $state(null);
   let startOfWeek = $derived(getStartOfWeek(days));
 
-  const unsubscribe = fileCache.store.subscribe(() => {
-    file = fileCache.getFile(days[0], "week");
-    metadata = fileCache.getEvaluatedMetadata(
-      "week",
-      days[0],
-      getSourceSettings,
-    );
+  $effect(() => {
+    return fileCache.store.subscribe(() => {
+      file = fileCache.getFile(days[0], "week");
+      metadata = fileCache.getEvaluatedMetadata(
+        "week",
+        days[0],
+        getSourceSettings,
+      );
+    });
   });
-  onDestroy(unsubscribe);
 
   function handleHover(event: PointerEvent) {
     if (event.target) {
@@ -74,7 +74,7 @@
         tabindex="0"
         class="week-num"
         class:active={selectedId === getDateUID(days[0], 'week')}
-        draggable={true}
+        draggable={!!file}
         onclick={onClick &&
           ((e) => onClick('week', startOfWeek, file, isMetaPressed(e)))}
         onkeydown={onClick &&

@@ -3,14 +3,14 @@ import type { Moment } from "moment";
 import type { IMonth, IWeek } from "./types";
 
 function isMacOS() {
-  return navigator.appVersion.indexOf("Mac") !== -1;
+  return navigator.userAgent.includes("Mac");
 }
 
 export function isMetaPressed(e: MouseEvent): boolean {
   return isMacOS() ? e.metaKey : e.ctrlKey;
 }
 
-export function getDaysOfWeek(): string[] {
+export function getDaysOfWeek(_today?: Moment): string[] {
   return window.moment.weekdaysShort(true);
 }
 
@@ -26,7 +26,7 @@ export function getStartOfWeek(days: Moment[]): Moment {
  * Generate a 2D array of daily information to power
  * the calendar view.
  */
-export function getMonth(displayedMonth: Moment): IMonth {
+export function getMonth(displayedMonth: Moment, _today?: Moment): IMonth {
   const locale = window.moment().locale();
   const month = [];
   let week!: IWeek;

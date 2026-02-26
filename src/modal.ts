@@ -28,8 +28,11 @@ class ConfirmationModal extends Modal {
           text: cta,
         })
         .addEventListener("click", async (e) => {
-          await onAccept(e);
-          this.close();
+          try {
+            await onAccept(e);
+          } finally {
+            this.close();
+          }
         });
     });
   }
