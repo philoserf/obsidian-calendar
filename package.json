@@ -18,7 +18,7 @@
     "validate": "bun run scripts/validate-plugin.ts",
     "test": "bun test",
     "version": "bun run version-bump.ts",
-    "deploy": "cp dist/main.js manifest.json styles.css \"$CALENDAR_DEPLOY_DIR\""
+    "deploy": "cp dist/main.js manifest.json styles.css ~/source/mine/notes/.obsidian/plugins/calendar/"
   },
   "dependencies": {
     "svelte": "^5.53.0"
