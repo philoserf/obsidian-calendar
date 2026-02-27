@@ -7,7 +7,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "vite build --watch --mode development",
     "build": "bun run check && vite build",
     "check": "bun run typecheck && biome check . && svelte-check",
     "typecheck": "tsc --noEmit",
@@ -18,7 +18,7 @@
     "validate": "bun run scripts/validate-plugin.ts",
     "test": "bun test",
     "version": "bun run version-bump.ts",
-    "deploy": "cp dist/main.js manifest.json styles.css ~/source/mine/notes/.obsidian/plugins/metadator/"
+    "deploy": "cp dist/main.js manifest.json styles.css \"$CALENDAR_DEPLOY_DIR\""
   },
   "dependencies": {
     "svelte": "^5.53.0"

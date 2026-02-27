@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import { Plugin } from "obsidian";
-  import { setContext } from "svelte";
+  import { onDestroy, setContext } from "svelte";
   import { get, writable } from "svelte/store";
 
   import type { ISettings } from "src/settings";
@@ -17,14 +16,12 @@
 
   // Props from view.ts
   let {
-    plugin,
     fileCache,
     sources = [],
     onHover,
     onClick,
     onContextMenu,
   }: {
-    plugin: Plugin;
     fileCache: PeriodicNotesCache;
     sources?: ICalendarSource[];
     onHover: IEventHandlers["onHover"];
@@ -39,6 +36,10 @@
   $effect(() => {
     today = getToday($settings);
   });
+
+  // Initialise store and context before any $derived blocks that read $displayedMonthStore
+  let displayedMonthStore = writable<Moment>(window.moment());
+  setContext(DISPLAYED_MONTH, displayedMonthStore);
 
   let showWeekNums = $derived($settings.showWeeklyNote);
   let selectedId = $derived($activeFile);
@@ -73,7 +74,7 @@
 
   // Heartbeat: update today every 60s; auto-advance displayed month if the user
   // was viewing the current month when the month boundary crossed.
-  let heartbeat = setInterval(() => {
+  const heartbeat = setInterval(() => {
     const prevToday = today;
     tick();
     if (!prevToday.isSame(today, "month")) {
@@ -83,13 +84,9 @@
     }
   }, 1000 * 60);
 
-  import { onDestroy } from "svelte";
   onDestroy(() => {
     clearInterval(heartbeat);
   });
-
-  let displayedMonthStore = writable<Moment>(window.moment());
-  setContext(DISPLAYED_MONTH, displayedMonthStore);
 </script>
 
 <div id="calendar-container" class="container">

@@ -2,7 +2,7 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 import path from "node:path";
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [svelte({ emitCss: false, compilerOptions: { runes: true } })],
   resolve: {
     alias: {
@@ -15,7 +15,7 @@ export default defineConfig({
       formats: ["cjs"],
       fileName: () => "main.js",
     },
-    sourcemap: process.env.NODE_ENV === "development" ? "inline" : false,
+    sourcemap: mode === "development" ? "inline" : false,
     rollupOptions: {
       external: ["obsidian", "fs", "os", "path"],
       output: {
@@ -23,4 +23,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
