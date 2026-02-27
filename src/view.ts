@@ -1,6 +1,6 @@
 import type { Moment } from "moment";
 import { ItemView, type TFile, type WorkspaceLeaf } from "obsidian";
-import { PLUGIN_ID, TRIGGER_ON_OPEN, VIEW_TYPE_CALENDAR } from "src/constants";
+import { TRIGGER_ON_OPEN, VIEW_TYPE_CALENDAR } from "src/constants";
 import { tryToCreateDailyNote, tryToCreateWeeklyNote } from "src/io/notes";
 import type { ISettings } from "src/settings";
 import { mount, unmount } from "svelte";
@@ -70,10 +70,6 @@ export default class CalendarView extends ItemView {
       // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
       target: (this as any).contentEl,
       props: {
-        plugin:
-          this.app.plugins.getPlugin(PLUGIN_ID) ??
-          // biome-ignore lint/suspicious/noExplicitAny: fallback when manifest ID diverges from view type
-          (this as unknown as any),
         fileCache,
         sources,
         onHover: this.onHover.bind(this),
@@ -168,6 +164,7 @@ export default class CalendarView extends ItemView {
   }
 
   public revealActiveNote(): void {
+    if (!this.calendar) return;
     const { moment } = window;
     const file = this.app.workspace.getActiveFile();
     if (!file) return;
