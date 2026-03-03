@@ -10,6 +10,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    outDir: ".",
+    emptyOutDir: false,
     lib: {
       entry: "src/main.ts",
       formats: ["cjs"],
