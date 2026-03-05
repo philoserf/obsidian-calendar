@@ -50,10 +50,10 @@
 
   $effect(() => {
     return fileCache.store.subscribe(() => {
-      file = fileCache.getFile(days[0], "week");
+      file = fileCache.getFile(startOfWeek, "week");
       metadata = fileCache.getEvaluatedMetadata(
         "week",
-        days[0],
+        startOfWeek,
         getSourceSettings,
       );
     });
@@ -61,7 +61,7 @@
 
   function handleHover(event: PointerEvent) {
     if (event.target) {
-      onHover?.("week", days[0], file, event.target, isMetaPressed(event));
+      onHover?.("week", startOfWeek, file, event.target, isMetaPressed(event));
     }
   }
 </script>
@@ -73,14 +73,14 @@
         role="button"
         tabindex="0"
         class="week-num"
-        class:active={selectedId === getDateUID(days[0], 'week')}
+        class:active={selectedId === getDateUID(startOfWeek, 'week')}
         draggable={!!file}
         onclick={onClick &&
           ((e) => onClick('week', startOfWeek, file, isMetaPressed(e)))}
         onkeydown={onClick &&
           ((e) => (e.key === 'Enter' || e.key === ' ') && onClick('week', startOfWeek, file, false))}
         oncontextmenu={onContextMenu &&
-          ((e) => onContextMenu('week', days[0], file, e))}
+          ((e) => onContextMenu('week', startOfWeek, file, e))}
         ondragstart={file ? (event) => fileCache.onDragStart(event, file!) : undefined}
         onpointerenter={handleHover}
       >
