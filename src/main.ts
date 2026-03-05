@@ -3,7 +3,7 @@ import { configureGlobalMomentLocale } from "./components/localization";
 import { VIEW_TYPE_CALENDAR } from "./constants";
 import { tryToCreateWeeklyNote } from "./io/notes";
 import {
-  appHasPeriodicNotesPluginLoaded,
+  appHasPeriodicNotesWeeklyEnabled,
   CalendarSettingsTab,
   type ISettings,
 } from "./settings";
@@ -50,7 +50,7 @@ export default class CalendarPlugin extends Plugin {
       name: "Open Weekly Note",
       checkCallback: (checking) => {
         if (checking) {
-          return !appHasPeriodicNotesPluginLoaded();
+          return !appHasPeriodicNotesWeeklyEnabled();
         }
         tryToCreateWeeklyNote(window.moment(), false, this.options);
       },

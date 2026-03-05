@@ -35,7 +35,7 @@ export const defaultSettings = Object.freeze({
   localeOverride: "system-default",
 });
 
-export function appHasPeriodicNotesPluginLoaded(): boolean {
+export function appHasPeriodicNotesWeeklyEnabled(): boolean {
   // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
   const periodicNotes = (<any>window.app).plugins.getPlugin("periodic-notes");
   return !!periodicNotes?.settings?.weekly?.enabled;
@@ -74,7 +74,7 @@ export class CalendarSettingsTab extends PluginSettingTab {
 
     if (
       this.plugin.options.showWeeklyNote &&
-      !appHasPeriodicNotesPluginLoaded()
+      !appHasPeriodicNotesWeeklyEnabled()
     ) {
       this.containerEl.createEl("h3", {
         text: "Weekly Note Settings",
