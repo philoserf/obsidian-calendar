@@ -116,7 +116,7 @@ export class CalendarSettingsTab extends PluginSettingTab {
     const { moment } = window;
 
     const localizedWeekdays = moment.weekdays();
-    const localeWeekStartNum = window._bundledLocaleWeekSpec.dow;
+    const localeWeekStartNum = window._bundledLocaleWeekSpec?.dow ?? 0;
     const localeWeekStart = moment.weekdays()[localeWeekStartNum];
 
     new Setting(this.containerEl)
