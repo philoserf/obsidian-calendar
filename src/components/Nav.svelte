@@ -54,7 +54,7 @@
     />
     <button
       type="button"
-      aria-label={!showingCurrentMonth ? 'Reset to current month' : null}
+      aria-label={showingCurrentMonth ? 'Current month' : 'Reset to current month'}
       class="reset-button"
       class:active={!showingCurrentMonth}
       onclick={resetDisplayedMonth}

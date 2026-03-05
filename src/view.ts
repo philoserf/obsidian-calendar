@@ -67,8 +67,7 @@ export default class CalendarView extends ItemView {
     const fileCache = new PeriodicNotesCache(this, sources);
 
     const cal = mount(Calendar, {
-      // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-      target: (this as any).contentEl,
+      target: this.contentEl,
       props: {
         fileCache,
         sources,

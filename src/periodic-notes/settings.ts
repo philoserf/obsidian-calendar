@@ -6,7 +6,9 @@ const DEFAULT_MONTHLY_NOTE_FORMAT = "YYYY-MM";
 const DEFAULT_QUARTERLY_NOTE_FORMAT = "YYYY-[Q]Q";
 const DEFAULT_YEARLY_NOTE_FORMAT = "YYYY";
 
-function shouldUsePeriodicNotesSettings(periodicity: string): boolean {
+type Periodicity = "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
+
+function shouldUsePeriodicNotesSettings(periodicity: Periodicity): boolean {
   const periodicNotes = window.app.plugins.getPlugin("periodic-notes");
   return !!(
     // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type

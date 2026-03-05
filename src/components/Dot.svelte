@@ -5,7 +5,7 @@
 
 <svg
   class="dot"
-  style="color:{color}"
+  style={color ? `color:${color}` : undefined}
   viewBox="0 0 6 6"
   xmlns="http://www.w3.org/2000/svg"
 >
