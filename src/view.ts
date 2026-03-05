@@ -66,7 +66,7 @@ export default class CalendarView extends ItemView {
 
     const fileCache = new PeriodicNotesCache(this, sources);
 
-    this.calendar = mount(Calendar, {
+    const cal = mount(Calendar, {
       // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
       target: (this as any).contentEl,
       props: {
@@ -76,7 +76,11 @@ export default class CalendarView extends ItemView {
         onClick: this.onClick.bind(this),
         onContextMenu: this.onContextMenu.bind(this),
       },
-    }) as unknown as CalendarExports;
+    });
+    if (!("tick" in cal && "setDisplayedMonth" in cal)) {
+      throw new Error("Calendar component missing expected exports");
+    }
+    this.calendar = cal as CalendarExports;
   }
 
   private onHover(
