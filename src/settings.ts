@@ -1,16 +1,10 @@
 import { type App, PluginSettingTab, Setting } from "obsidian";
 import { DEFAULT_WEEK_FORMAT, DEFAULT_WORDS_PER_DOT } from "src/constants";
-import {
-  type ILocaleOverride,
-  type IWeekStartOption,
-  weekdays,
-} from "./components/localization";
 import type CalendarPlugin from "./main";
 import { appHasDailyNotesPluginLoaded } from "./periodic-notes";
 
 export interface ISettings {
   wordsPerDot: number;
-  weekStart: IWeekStartOption;
   shouldConfirmBeforeCreate: boolean;
 
   // Weekly Note settings
@@ -18,21 +12,16 @@ export interface ISettings {
   weeklyNoteFormat: string;
   weeklyNoteTemplate: string;
   weeklyNoteFolder: string;
-
-  localeOverride: ILocaleOverride;
 }
 
 export const defaultSettings = Object.freeze({
   shouldConfirmBeforeCreate: true,
-  weekStart: "locale" as IWeekStartOption,
   wordsPerDot: DEFAULT_WORDS_PER_DOT,
 
   showWeeklyNote: false,
   weeklyNoteFormat: "",
   weeklyNoteTemplate: "",
   weeklyNoteFolder: "",
-
-  localeOverride: "system-default",
 });
 
 export function appHasPeriodicNotesWeeklyEnabled(): boolean {
@@ -68,7 +57,6 @@ export class CalendarSettingsTab extends PluginSettingTab {
       text: "General Settings",
     });
     this.addDotThresholdSetting();
-    this.addWeekStartSetting();
     this.addConfirmCreateSetting();
     this.addShowWeeklyNoteSetting();
 
@@ -87,11 +75,6 @@ export class CalendarSettingsTab extends PluginSettingTab {
       this.addWeeklyNoteTemplateSetting();
       this.addWeeklyNoteFolderSetting();
     }
-
-    this.containerEl.createEl("h3", {
-      text: "Advanced Settings",
-    });
-    this.addLocaleOverrideSetting();
   }
 
   addDotThresholdSetting(): void {
@@ -107,32 +90,6 @@ export class CalendarSettingsTab extends PluginSettingTab {
           this.plugin.writeOptions(() => ({
             wordsPerDot:
               Number.isFinite(n) && n > 0 ? n : DEFAULT_WORDS_PER_DOT,
-          }));
-        });
-      });
-  }
-
-  addWeekStartSetting(): void {
-    const { moment } = window;
-
-    const localizedWeekdays = moment.weekdays();
-    const localeWeekStartNum = window._bundledLocaleWeekSpec?.dow ?? 0;
-    const localeWeekStart = moment.weekdays()[localeWeekStartNum];
-
-    new Setting(this.containerEl)
-      .setName("Start week on:")
-      .setDesc(
-        "Choose what day of the week to start. Select 'Locale default' to use the default specified by moment.js",
-      )
-      .addDropdown((dropdown) => {
-        dropdown.addOption("locale", `Locale default (${localeWeekStart})`);
-        localizedWeekdays.forEach((day, i) => {
-          dropdown.addOption(weekdays[i], day);
-        });
-        dropdown.setValue(this.plugin.options.weekStart);
-        dropdown.onChange(async (value) => {
-          this.plugin.writeOptions(() => ({
-            weekStart: value as IWeekStartOption,
           }));
         });
       });
@@ -200,30 +157,6 @@ export class CalendarSettingsTab extends PluginSettingTab {
         textfield.setValue(this.plugin.options.weeklyNoteFolder);
         textfield.onChange(async (value) => {
           this.plugin.writeOptions(() => ({ weeklyNoteFolder: value }));
-        });
-      });
-  }
-
-  addLocaleOverrideSetting(): void {
-    const { moment } = window;
-
-    const sysLocale = navigator.language?.toLowerCase();
-
-    new Setting(this.containerEl)
-      .setName("Override locale:")
-      .setDesc(
-        "Set this if you want to use a locale different from the default",
-      )
-      .addDropdown((dropdown) => {
-        dropdown.addOption("system-default", `Same as system (${sysLocale})`);
-        moment.locales().forEach((locale) => {
-          dropdown.addOption(locale, locale);
-        });
-        dropdown.setValue(this.plugin.options.localeOverride);
-        dropdown.onChange(async (value) => {
-          this.plugin.writeOptions(() => ({
-            localeOverride: value as ILocaleOverride,
-          }));
         });
       });
   }
