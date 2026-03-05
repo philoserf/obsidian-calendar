@@ -39,6 +39,7 @@ async function getWordLengthAsDots(note: TFile): Promise<number> {
 
   const wordCount = getWordCount(fileContents);
   const numDots = wordCount / wordsPerDot;
+  // Minimum of 1: a dot signals the note exists, regardless of word count
   return clamp(Math.floor(numDots), 1, MAX_DOTS);
 }
 
