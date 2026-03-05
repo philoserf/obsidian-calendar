@@ -1,5 +1,5 @@
 import type { Moment } from "moment";
-import type { TFile } from "obsidian";
+import { Notice, type TFile } from "obsidian";
 import { createConfirmationDialog } from "src/modal";
 import type { ISettings } from "src/settings";
 import {
@@ -23,11 +23,15 @@ async function tryToCreateNote(
   const filename = date.format(format);
 
   const createFile = async () => {
-    const note = await createNote(date);
-    const leaf = workspace.getLeaf(inNewSplit ? "split" : false);
-
-    await leaf.openFile(note, { active: true });
-    cb?.(note);
+    try {
+      const note = await createNote(date);
+      const leaf = workspace.getLeaf(inNewSplit ? "split" : false);
+      await leaf.openFile(note, { active: true });
+      cb?.(note);
+    } catch (err) {
+      console.error(`[Calendar] Failed to create ${title}`, err);
+      new Notice(`Failed to create note: ${filename}`);
+    }
   };
 
   if (settings.shouldConfirmBeforeCreate) {

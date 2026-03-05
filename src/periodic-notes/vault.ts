@@ -121,8 +121,10 @@ export async function createDailyNote(date: Moment): Promise<TFile> {
         )
         .replace(/{{\s*tomorrow\s*}}/gi, date.clone().add(1, "d").format(fmt)),
     );
-    // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-    (window.app as any).foldManager.save(createdFile, foldInfo);
+    if (foldInfo) {
+      // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
+      (window.app as any).foldManager.save(createdFile, foldInfo);
+    }
     return createdFile;
   } catch (err) {
     console.error(`Failed to create file: '${normalizedPath}'`, err);
@@ -198,8 +200,10 @@ export async function createWeeklyNote(date: Moment): Promise<TFile> {
           },
         ),
     );
-    // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-    (window.app as any).foldManager.save(createdFile, foldInfo);
+    if (foldInfo) {
+      // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
+      (window.app as any).foldManager.save(createdFile, foldInfo);
+    }
     return createdFile;
   } catch (err) {
     console.error(`Failed to create file: '${normalizedPath}'`, err);

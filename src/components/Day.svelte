@@ -107,7 +107,7 @@
         onclick={handleClick}
         oncontextmenu={handleContextmenu}
         onpointerenter={handleHover}
-        ondragstart={file ? (event) => fileCache.onDragStart(event, file!) : undefined}
+        ondragstart={(event) => { if (file) fileCache.onDragStart(event, file); }}
       >
         {date.format("D")}
         <Dots metadata={metadata ?? []} />

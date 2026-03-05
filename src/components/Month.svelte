@@ -105,7 +105,7 @@
       oncontextmenu={metadata &&
         onContextMenu &&
         ((e) => onContextMenu('month', $displayedMonth, file, e))}
-      ondragstart={file ? (event) => fileCache.onDragStart(event, file!) : undefined}
+      ondragstart={(event) => { if (file) fileCache.onDragStart(event, file); }}
       onpointerenter={handleHover}
     >
       <span class="title">

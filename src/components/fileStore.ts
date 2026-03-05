@@ -131,11 +131,11 @@ export default class PeriodicNotesCache {
 
   public getFile(date: Moment, granularity: IGranularity): TFile | null {
     const uid = getDateUID(date, granularity);
-    return get(this.store)[uid];
+    return get(this.store)[uid] ?? null;
   }
 
   public getFileForPeriodicNote(id: PeriodicNoteID): TFile | null {
-    return get(this.store)[id];
+    return get(this.store)[id] ?? null;
   }
 
   public async getEvaluatedMetadata(
