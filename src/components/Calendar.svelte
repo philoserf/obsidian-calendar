@@ -8,7 +8,6 @@
   import { DISPLAYED_MONTH } from "./context";
   import Day from "./Day.svelte";
   import type PeriodicNotesCache from "./fileStore";
-  import { configureGlobalMomentLocale } from "./localization";
   import Nav from "./Nav.svelte";
   import type { ICalendarSource, IEventHandlers, IMonth, ISourceSettings } from "./types";
   import { getDaysOfWeek, getMonth, isWeekend } from "./utils";
@@ -58,8 +57,7 @@
     displayedMonthStore.set(date);
   }
 
-  function getToday(s: ISettings) {
-    configureGlobalMomentLocale(s.localeOverride, s.weekStart);
+  function getToday(_s: ISettings) {
     return window.moment();
   }
 
