@@ -51,27 +51,19 @@
   let metadata: Promise<IDayMetadata[]> | null = $state(null);
   let file: TFile | null = $state(null);
 
+  function refresh() {
+    file = fileCache.getFile($displayedMonth, "month");
+    metadata = fileCache.getEvaluatedMetadata(
+      "month",
+      $displayedMonth,
+      getSourceSettings,
+    );
+  }
+
   $effect(() => {
-    const unsub1 = fileCache.store.subscribe(() => {
-      file = fileCache.getFile($displayedMonth, "month");
-      metadata = fileCache.getEvaluatedMetadata(
-        "month",
-        $displayedMonth,
-        getSourceSettings,
-      );
-    });
-    const unsub2 = displayedMonth.subscribe(() => {
-      file = fileCache.getFile($displayedMonth, "month");
-      metadata = fileCache.getEvaluatedMetadata(
-        "month",
-        $displayedMonth,
-        getSourceSettings,
-      );
-    });
-    return () => {
-      unsub1();
-      unsub2();
-    };
+    // Reading $displayedMonth here makes Svelte re-run the effect on month changes
+    $displayedMonth;
+    return fileCache.store.subscribe(() => refresh());
   });
 
   function handleHover(event: PointerEvent) {
