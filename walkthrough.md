@@ -2936,16 +2936,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Check
-        run: bun run check
+      - run: bun install
+      - run: bun audit --audit-level=critical
+      - run: bun run check
+      - run: bun test
 
 === Release ===
 name: Release
@@ -2954,6 +2951,9 @@ on:
   push:
     tags:
       - "*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -2974,6 +2974,7 @@ jobs:
         with:
           files: |
             main.js
+            styles.css
             manifest.json
           fail_on_unmatched_files: true
         env:
@@ -3001,7 +3002,9 @@ import moment from "moment";
 import { getDaysOfWeek, getMonth, getStartOfWeek, isWeekend } from "./utils";
 
 beforeAll(() => {
-  (globalThis as any).window = { moment };
+  (globalThis as unknown as { window: { moment: typeof moment } }).window = {
+    moment,
+  };
   moment.locale("en");
   moment.updateLocale("en", { week: { dow: 0, doy: 6 } });
 });
@@ -3124,7 +3127,9 @@ mock.module("./settings", () => ({
 }));
 
 beforeAll(() => {
-  (globalThis as any).window = { moment };
+  (globalThis as unknown as { window: { moment: typeof moment } }).window = {
+    moment,
+  };
   moment.locale("en");
 });
 
@@ -3167,13 +3172,13 @@ describe("getDateFromPath", () => {
   it("extracts a daily note date from a full path", () => {
     const result = getDateFromPath("journals/daily/2024-02-26.md", "day");
     expect(result).not.toBeNull();
-    expect(result!.format("YYYY-MM-DD")).toBe("2024-02-26");
+    expect(result?.format("YYYY-MM-DD")).toBe("2024-02-26");
   });
 
   it("extracts a weekly note date from a path", () => {
     const result = getDateFromPath("weekly/2024-W08.md", "week");
     expect(result).not.toBeNull();
-    expect(result!.isValid()).toBe(true);
+    expect(result?.isValid()).toBe(true);
   });
 
   it("returns null for a path that does not match", () => {
@@ -3188,7 +3193,7 @@ describe("getDateFromPath", () => {
   it("handles paths without directory separators", () => {
     const result = getDateFromPath("2024-03-15.md", "day");
     expect(result).not.toBeNull();
-    expect(result!.format("YYYY-MM-DD")).toBe("2024-03-15");
+    expect(result?.format("YYYY-MM-DD")).toBe("2024-03-15");
   });
 });
 ```
@@ -3288,4 +3293,3 @@ Augments Obsidian's types with `window.app`, `app.plugins.getPlugin()`, and work
 - Good separation: view (controller) / components (UI) / periodic-notes (data) / io (side effects)
 - Workspace event integration for cross-plugin communication
 - Template variable expansion is thorough and well-structured
-
