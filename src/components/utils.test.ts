@@ -3,7 +3,9 @@ import moment from "moment";
 import { getDaysOfWeek, getMonth, getStartOfWeek, isWeekend } from "./utils";
 
 beforeAll(() => {
-  (globalThis as any).window = { moment };
+  (globalThis as unknown as { window: { moment: typeof moment } }).window = {
+    moment,
+  };
   moment.locale("en");
   moment.updateLocale("en", { week: { dow: 0, doy: 6 } });
 });

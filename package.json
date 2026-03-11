@@ -1,11 +1,11 @@
 {
   "name": "calendar",
   "version": "3.0.0",
-  "main": "main.js",
   "description": "Calendar view of your daily, weekly, and monthly notes with metadata tracking for tasks, tags, word count, and streaks",
+  "main": "main.js",
+  "type": "module",
   "author": "Mark Ayers (originally by Liam Cain)",
   "license": "MIT",
-  "type": "module",
   "scripts": {
     "audit": "bun audit --audit-level=critical",
     "dev": "vite build --watch --mode development",
@@ -17,8 +17,8 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "validate": "bun run scripts/validate-plugin.ts",
-    "test": "bun test",
     "version": "bun run version-bump.ts",
+    "test": "bun test",
     "deploy": "cp main.js manifest.json styles.css ~/source/philoserf/notes/.obsidian/plugins/calendar/"
   },
   "dependencies": {
