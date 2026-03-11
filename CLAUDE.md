@@ -1,1 +1,44 @@
-AGENTS.md
+# CLAUDE.md
+
+## Project Overview
+
+Calendar view plugin for Obsidian, built with Svelte 5 and Vite.
+
+## Development Commands
+
+```bash
+bun install              # Install dependencies
+bun run dev              # Watch mode with auto-rebuild
+bun run build            # Production build (runs check first)
+bun run check            # Run all checks (typecheck + biome + svelte-check)
+bun run typecheck        # TypeScript type checking only
+bun run lint             # Biome lint + format check
+bun run lint:fix         # Auto-fix lint and format issues
+bun run format           # Format code with Biome
+bun run validate         # Full validation (types, checks, build, output)
+bun run version          # Sync package.json version to manifest.json + versions.json
+bun test                 # Run tests
+```
+
+## Architecture
+
+### Build System
+
+- **Build tool**: Vite with @sveltejs/vite-plugin-svelte
+- **Entry point**: `src/main.ts`
+- **Output**: `./main.js` (CommonJS format)
+- **Externals**: `obsidian`, `fs`, `os`, `path` are not bundled
+- Svelte components compiled with runes mode enabled
+
+### Release Process
+
+Tag and push to trigger the GitHub Actions release workflow:
+
+```bash
+git tag -a 1.0.0 -m "Release 1.0.0"
+git push origin 1.0.0
+```
+
+## Code Style
+
+Enforced by Biome: 2-space indent, organized imports, git-aware VCS integration.

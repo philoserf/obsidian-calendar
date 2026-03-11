@@ -30,7 +30,9 @@ mock.module("./settings", () => ({
 }));
 
 beforeAll(() => {
-  (globalThis as any).window = { moment };
+  (globalThis as unknown as { window: { moment: typeof moment } }).window = {
+    moment,
+  };
   moment.locale("en");
 });
 
@@ -73,13 +75,13 @@ describe("getDateFromPath", () => {
   it("extracts a daily note date from a full path", () => {
     const result = getDateFromPath("journals/daily/2024-02-26.md", "day");
     expect(result).not.toBeNull();
-    expect(result!.format("YYYY-MM-DD")).toBe("2024-02-26");
+    expect(result?.format("YYYY-MM-DD")).toBe("2024-02-26");
   });
 
   it("extracts a weekly note date from a path", () => {
     const result = getDateFromPath("weekly/2024-W08.md", "week");
     expect(result).not.toBeNull();
-    expect(result!.isValid()).toBe(true);
+    expect(result?.isValid()).toBe(true);
   });
 
   it("returns null for a path that does not match", () => {
@@ -94,6 +96,6 @@ describe("getDateFromPath", () => {
   it("handles paths without directory separators", () => {
     const result = getDateFromPath("2024-03-15.md", "day");
     expect(result).not.toBeNull();
-    expect(result!.format("YYYY-MM-DD")).toBe("2024-03-15");
+    expect(result?.format("YYYY-MM-DD")).toBe("2024-03-15");
   });
 });
