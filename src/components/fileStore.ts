@@ -1,7 +1,14 @@
 import type { Moment } from "moment";
-import { type App, type Component, type TAbstractFile, TFile } from "obsidian";
+import {
+  type App,
+  type Component,
+  Notice,
+  type TAbstractFile,
+  TFile,
+} from "obsidian";
 import type { Writable } from "svelte/store";
 import { get, writable } from "svelte/store";
+import { asEventWorkspace, getDragManager } from "../obsidian-internals";
 import {
   getAllDailyNotes,
   getAllMonthlyNotes,
@@ -61,8 +68,7 @@ export default class PeriodicNotesCache {
       this.initialize();
     });
 
-    // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-    const workspace = this.app.workspace as any;
+    const workspace = asEventWorkspace(this.app.workspace);
     component.registerEvent(
       workspace.on("periodic-notes:settings-updated", this.initialize, this),
     );
@@ -115,16 +121,27 @@ export default class PeriodicNotesCache {
   }
 
   public initialize(): void {
-    try {
-      this.store.set({
-        ...getAllDailyNotes(),
-        ...getAllWeeklyNotes(),
-        ...getAllMonthlyNotes(),
-      });
-    } catch (err) {
-      console.error(
-        "[Calendar] Failed to initialize periodic notes cache",
-        err,
+    const notes: Record<string, TFile> = {};
+    const failures: string[] = [];
+
+    for (const [label, loader] of [
+      ["daily", getAllDailyNotes],
+      ["weekly", getAllWeeklyNotes],
+      ["monthly", getAllMonthlyNotes],
+    ] as const) {
+      try {
+        Object.assign(notes, loader());
+      } catch (err) {
+        failures.push(label);
+        console.error(`[Calendar] Failed to load ${label} notes`, err);
+      }
+    }
+
+    this.store.set(notes);
+
+    if (failures.length > 0) {
+      new Notice(
+        `Calendar: failed to load ${failures.join(", ")} notes. Check the console for details.`,
       );
     }
   }
@@ -165,8 +182,7 @@ export default class PeriodicNotesCache {
   }
 
   public onDragStart(event: DragEvent, file: TFile): void {
-    // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-    const dragManager = (<any>this.app).dragManager;
+    const dragManager = getDragManager(this.app);
     const dragData = dragManager.dragFile(event, file);
     dragManager.onDragStart(event, dragData);
   }

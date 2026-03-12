@@ -1,5 +1,6 @@
 import type { Moment } from "moment";
 import { Notice, normalizePath, TFile, TFolder, Vault } from "obsidian";
+import { getFoldManager, getWeekStartDay } from "../obsidian-internals";
 import { getDateFromFile, getDateUID } from "./parse";
 import {
   appHasMonthlyNotesPluginLoaded,
@@ -66,8 +67,7 @@ async function getTemplateInfo(
       throw new Error(`Template not found: ${templatePath}`);
     }
     const contents = await vault.cachedRead(templateFile);
-    // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-    const foldInfo = (window.app as any).foldManager.load(templateFile);
+    const foldInfo = getFoldManager(window.app).load(templateFile);
     return [contents, foldInfo];
   } catch (err) {
     console.error(
@@ -122,8 +122,7 @@ export async function createDailyNote(date: Moment): Promise<TFile> {
         .replace(/{{\s*tomorrow\s*}}/gi, date.clone().add(1, "d").format(fmt)),
     );
     if (foldInfo) {
-      // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-      (window.app as any).foldManager.save(createdFile, foldInfo);
+      getFoldManager(window.app).save(createdFile, foldInfo);
     }
     return createdFile;
   } catch (err) {
@@ -134,9 +133,7 @@ export async function createDailyNote(date: Moment): Promise<TFile> {
 }
 
 function getDaysOfWeek(): string[] {
-  const { moment } = window;
-  // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-  let weekStart = (moment.localeData() as any)._week.dow;
+  let weekStart = getWeekStartDay();
   const daysOfWeek = [
     "sunday",
     "monday",
@@ -201,8 +198,7 @@ export async function createWeeklyNote(date: Moment): Promise<TFile> {
         ),
     );
     if (foldInfo) {
-      // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-      (window.app as any).foldManager.save(createdFile, foldInfo);
+      getFoldManager(window.app).save(createdFile, foldInfo);
     }
     return createdFile;
   } catch (err) {
