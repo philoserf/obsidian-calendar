@@ -45,8 +45,8 @@
   let eventHandlers: IEventHandlers = $derived({ onHover, onClick, onContextMenu });
 
   // Pass `today` explicitly so the derived blocks re-evaluate when locale changes
-  let month: IMonth = $derived.by(() => getMonth($displayedMonthStore, today));
-  let daysOfWeek: string[] = $derived.by(() => getDaysOfWeek(today));
+  let month: IMonth = $derived.by(() => getMonth($displayedMonthStore));
+  let daysOfWeek: string[] = $derived.by(() => getDaysOfWeek());
 
   // Public API for view.ts
   export function tick() {

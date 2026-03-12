@@ -10,7 +10,7 @@ export function isMetaPressed(e: MouseEvent): boolean {
   return isMacOS() ? e.metaKey : e.ctrlKey;
 }
 
-export function getDaysOfWeek(_today?: Moment): string[] {
+export function getDaysOfWeek(): string[] {
   return window.moment.weekdaysShort(true);
 }
 
@@ -26,7 +26,7 @@ export function getStartOfWeek(days: Moment[]): Moment {
  * Generate a 2D array of daily information to power
  * the calendar view.
  */
-export function getMonth(displayedMonth: Moment, _today?: Moment): IMonth {
+export function getMonth(displayedMonth: Moment): IMonth {
   const locale = window.moment().locale();
   const month = [];
   let week!: IWeek;
