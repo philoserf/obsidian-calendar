@@ -6,12 +6,11 @@
   import type { ISettings } from "src/settings";
   import { activeFile, settings } from "../stores";
   import { DISPLAYED_MONTH } from "./context";
-  import Day from "./Day.svelte";
   import type PeriodicNotesCache from "./fileStore";
   import Nav from "./Nav.svelte";
+  import PeriodicNoteCell from "./PeriodicNoteCell.svelte";
   import type { ICalendarSource, IEventHandlers, IMonth, ISourceSettings } from "./types";
-  import { getDaysOfWeek, getMonth, isWeekend } from "./utils";
-  import WeekNum from "./WeekNum.svelte";
+  import { getDaysOfWeek, getMonth, getStartOfWeek, isWeekend } from "./utils";
 
   // Props from view.ts
   let {
@@ -121,17 +120,21 @@
       {#each month as week (week.weekNum)}
         <tr>
           {#if showWeekNums}
-            <WeekNum
+            <PeriodicNoteCell
+              granularity="week"
+              date={getStartOfWeek(week.days)}
+              label={String(week.weekNum)}
               {fileCache}
               {selectedId}
               {getSourceSettings}
-              {...week}
               {...eventHandlers}
             />
           {/if}
           {#each week.days as day (day.format())}
-            <Day
+            <PeriodicNoteCell
+              granularity="day"
               date={day}
+              label={day.format("D")}
               {fileCache}
               {getSourceSettings}
               {today}

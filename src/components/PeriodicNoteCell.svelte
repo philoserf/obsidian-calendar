@@ -16,16 +16,20 @@
   import { getAttributes, isMetaPressed } from "./utils";
 
   let {
+    granularity,
     date,
+    label,
     fileCache,
     getSourceSettings,
     onHover,
     onClick,
     onContextMenu,
-    today,
+    today = undefined,
     selectedId = null,
   }: {
+    granularity: IGranularity;
     date: Moment;
+    label: string;
     fileCache: PeriodicNotesCache;
     getSourceSettings: (sourceId: string) => ISourceSettings;
     onHover: (
@@ -47,7 +51,7 @@
       file: TFile | null,
       event: MouseEvent,
     ) => void;
-    today: Moment;
+    today?: Moment;
     selectedId: string | null;
   } = $props();
 
@@ -58,43 +62,56 @@
 
   $effect(() => {
     return fileCache.store.subscribe(() => {
-      file = fileCache.getFile(date, "day");
-      metadata = fileCache.getEvaluatedMetadata("day", date, getSourceSettings);
+      file = fileCache.getFile(date, granularity);
+      metadata = fileCache.getEvaluatedMetadata(granularity, date, getSourceSettings);
     });
   });
 
   function handleClick(event: MouseEvent) {
-    onClick?.("day", date, file, isMetaPressed(event));
+    onClick?.(granularity, date, file, isMetaPressed(event));
   }
 
   function handleHover(event: PointerEvent) {
     if (event.target) {
-      onHover?.("day", date, file, event.target, isMetaPressed(event));
+      onHover?.(granularity, date, file, event.target, isMetaPressed(event));
     }
   }
 
   function handleContextmenu(event: MouseEvent) {
-    onContextMenu?.("day", date, file, event);
+    onContextMenu?.(granularity, date, file, event);
   }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === "Enter" || event.key === " ") {
+      onClick?.(granularity, date, file, false);
+    }
+  }
+
+  let isDay = $derived(granularity === "day");
+  let cellClass = $derived(isDay ? "day" : "week-num");
 </script>
 
-<td>
+<td class:week-num-td={!isDay}>
   <MetadataResolver {metadata}>
     {#snippet children(metadata)}
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
-        class="day"
-        class:active={selectedId === getDateUID(date, 'day')}
-        class:adjacent-month={!date.isSame($displayedMonth, 'month')}
+        role={isDay ? undefined : "button"}
+        tabindex={isDay ? undefined : 0}
+        class={cellClass}
+        class:active={selectedId === getDateUID(date, granularity)}
+        class:adjacent-month={isDay && !date.isSame($displayedMonth, 'month')}
         class:has-note={!!file}
-        class:today={date.isSame(today, 'day')}
+        class:today={isDay && today != null && date.isSame(today, 'day')}
         draggable={!!file}
-        {...getAttributes(metadata ?? [])}
+        {...isDay ? getAttributes(metadata ?? []) : {}}
         onclick={handleClick}
+        onkeydown={isDay ? undefined : handleKeydown}
         oncontextmenu={handleContextmenu}
         onpointerenter={handleHover}
         ondragstart={(event) => { if (file) fileCache.onDragStart(event, file); }}
       >
-        {date.format("D")}
+        {label}
         <Dots metadata={metadata ?? []} />
       </div>
     {/snippet}
@@ -134,6 +151,36 @@
   .day:active,
   .active,
   .active.today {
+    color: var(--text-on-accent);
+    background-color: var(--interactive-accent);
+  }
+
+  .week-num-td {
+    border-right: 1px solid var(--background-modifier-border);
+  }
+
+  .week-num {
+    background-color: var(--color-background-weeknum);
+    border-radius: 4px;
+    color: var(--color-text-weeknum);
+    cursor: pointer;
+    font-size: 0.65em;
+    height: 100%;
+    padding: 4px;
+    text-align: center;
+    transition: background-color 0.1s ease-in, color 0.1s ease-in;
+    vertical-align: baseline;
+  }
+
+  .week-num:hover {
+    background-color: var(--interactive-hover);
+  }
+
+  .week-num.active:hover {
+    background-color: var(--interactive-accent-hover);
+  }
+
+  .week-num.active {
     color: var(--text-on-accent);
     background-color: var(--interactive-accent);
   }
