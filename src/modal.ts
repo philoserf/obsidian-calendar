@@ -1,4 +1,4 @@
-import { type App, Modal } from "obsidian";
+import { type App, Modal, Notice } from "obsidian";
 
 interface IConfirmationDialogParams {
   cta: string;
@@ -30,6 +30,9 @@ class ConfirmationModal extends Modal {
         .addEventListener("click", async (e) => {
           try {
             await onAccept(e);
+          } catch (err) {
+            console.error("[Calendar] Confirmation action failed", err);
+            new Notice("Something went wrong. Check the console for details.");
           } finally {
             this.close();
           }
