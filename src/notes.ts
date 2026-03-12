@@ -7,7 +7,7 @@ import {
   createWeeklyNote,
   getDailyNoteSettings,
   getWeeklyNoteSettings,
-} from "../periodic-notes";
+} from "./periodic-notes";
 
 async function tryToCreateNote(
   date: Moment,

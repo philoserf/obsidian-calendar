@@ -1,6 +1,6 @@
 import { Plugin, type WorkspaceLeaf } from "obsidian";
 import { VIEW_TYPE_CALENDAR } from "./constants";
-import { tryToCreateWeeklyNote } from "./io/notes";
+import { tryToCreateWeeklyNote } from "./notes";
 import {
   appHasPeriodicNotesWeeklyEnabled,
   CalendarSettingsTab,

@@ -1,7 +1,7 @@
 import type { Moment } from "moment";
 import { ItemView, type TFile, type WorkspaceLeaf } from "obsidian";
 import { TRIGGER_ON_OPEN, VIEW_TYPE_CALENDAR } from "src/constants";
-import { tryToCreateDailyNote, tryToCreateWeeklyNote } from "src/io/notes";
+import { tryToCreateDailyNote, tryToCreateWeeklyNote } from "src/notes";
 import type { ISettings } from "src/settings";
 import { mount, unmount } from "svelte";
 import Calendar from "./components/Calendar.svelte";
