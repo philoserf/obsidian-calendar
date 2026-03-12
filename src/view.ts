@@ -12,8 +12,8 @@ import {
   getWeeklyNoteSettings,
   type IGranularity,
 } from "./periodic-notes";
-import { wordCountSource } from "./sources";
 import { activeFile, settings } from "./stores";
+import { wordCountSource } from "./word-count-source";
 
 interface CalendarExports {
   tick: () => void;
