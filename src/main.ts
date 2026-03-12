@@ -93,7 +93,12 @@ export default class CalendarPlugin extends Plugin {
     const validated = raw ? validateSettings(raw) : {};
     settings.update((old) => ({ ...old, ...validated }));
 
-    await this.saveData(this.options);
+    // Re-save only if validation stripped invalid keys
+    const validatedKeyCount = Object.keys(validated).length;
+    const rawKeyCount = raw ? Object.keys(raw).length : 0;
+    if (validatedKeyCount !== rawKeyCount) {
+      await this.saveData(this.options);
+    }
   }
 
   async writeOptions(
