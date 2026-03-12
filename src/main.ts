@@ -7,6 +7,7 @@ import {
   type ISettings,
 } from "./settings";
 import { settings } from "./stores";
+import { validateSettings } from "./validate-settings";
 import CalendarView from "./view";
 
 export default class CalendarPlugin extends Plugin {
@@ -88,13 +89,9 @@ export default class CalendarPlugin extends Plugin {
   }
 
   async loadOptions(): Promise<void> {
-    const options = await this.loadData();
-    settings.update((old) => {
-      return {
-        ...old,
-        ...(options || {}),
-      };
-    });
+    const raw = await this.loadData();
+    const validated = raw ? validateSettings(raw) : {};
+    settings.update((old) => ({ ...old, ...validated }));
 
     await this.saveData(this.options);
   }
