@@ -89,79 +89,43 @@ export function getWeeklyNoteSettings(): IPeriodicNoteSettings {
   };
 }
 
-export function getMonthlyNoteSettings(): IPeriodicNoteSettings {
+function getPeriodicNoteSettings(
+  periodicity: Periodicity,
+  defaultFormat: string,
+): IPeriodicNoteSettings {
   try {
-    const pluginManager = window.app.plugins;
     const periodicNotesSettings = getPluginSettings(
-      pluginManager.getPlugin("periodic-notes"),
+      window.app.plugins.getPlugin("periodic-notes"),
     );
-    const monthly =
-      (shouldUsePeriodicNotesSettings("monthly") &&
-        (periodicNotesSettings?.monthly as Record<string, unknown>)) ||
+    const settings =
+      (shouldUsePeriodicNotesSettings(periodicity) &&
+        (periodicNotesSettings?.[periodicity] as Record<string, unknown>)) ||
       {};
     return {
-      format: (monthly.format as string) || DEFAULT_MONTHLY_NOTE_FORMAT,
-      folder: (monthly.folder as string)?.trim() || "",
-      template: (monthly.template as string)?.trim() || "",
+      format: (settings.format as string) || defaultFormat,
+      folder: (settings.folder as string)?.trim() || "",
+      template: (settings.template as string)?.trim() || "",
     };
   } catch (err) {
-    console.info("No custom monthly note settings found!", err);
+    console.info(`No custom ${periodicity} note settings found!`, err);
   }
   return {
-    format: DEFAULT_MONTHLY_NOTE_FORMAT,
+    format: defaultFormat,
     folder: "",
     template: "",
   };
+}
+
+export function getMonthlyNoteSettings(): IPeriodicNoteSettings {
+  return getPeriodicNoteSettings("monthly", DEFAULT_MONTHLY_NOTE_FORMAT);
 }
 
 export function getQuarterlyNoteSettings(): IPeriodicNoteSettings {
-  try {
-    const pluginManager = window.app.plugins;
-    const periodicNotesSettings = getPluginSettings(
-      pluginManager.getPlugin("periodic-notes"),
-    );
-    const quarterly =
-      (shouldUsePeriodicNotesSettings("quarterly") &&
-        (periodicNotesSettings?.quarterly as Record<string, unknown>)) ||
-      {};
-    return {
-      format: (quarterly.format as string) || DEFAULT_QUARTERLY_NOTE_FORMAT,
-      folder: (quarterly.folder as string)?.trim() || "",
-      template: (quarterly.template as string)?.trim() || "",
-    };
-  } catch (err) {
-    console.info("No custom quarterly note settings found!", err);
-  }
-  return {
-    format: DEFAULT_QUARTERLY_NOTE_FORMAT,
-    folder: "",
-    template: "",
-  };
+  return getPeriodicNoteSettings("quarterly", DEFAULT_QUARTERLY_NOTE_FORMAT);
 }
 
 export function getYearlyNoteSettings(): IPeriodicNoteSettings {
-  try {
-    const pluginManager = window.app.plugins;
-    const periodicNotesSettings = getPluginSettings(
-      pluginManager.getPlugin("periodic-notes"),
-    );
-    const yearly =
-      (shouldUsePeriodicNotesSettings("yearly") &&
-        (periodicNotesSettings?.yearly as Record<string, unknown>)) ||
-      {};
-    return {
-      format: (yearly.format as string) || DEFAULT_YEARLY_NOTE_FORMAT,
-      folder: (yearly.folder as string)?.trim() || "",
-      template: (yearly.template as string)?.trim() || "",
-    };
-  } catch (err) {
-    console.info("No custom yearly note settings found!", err);
-  }
-  return {
-    format: DEFAULT_YEARLY_NOTE_FORMAT,
-    folder: "",
-    template: "",
-  };
+  return getPeriodicNoteSettings("yearly", DEFAULT_YEARLY_NOTE_FORMAT);
 }
 
 export function appHasDailyNotesPluginLoaded(): boolean {

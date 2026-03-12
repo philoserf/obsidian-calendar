@@ -132,7 +132,7 @@ export async function createDailyNote(date: Moment): Promise<TFile> {
   }
 }
 
-function getDaysOfWeek(): string[] {
+function getWeekdayOrder(): string[] {
   let weekStart = getWeekStartDay();
   const daysOfWeek = [
     "sunday",
@@ -152,7 +152,7 @@ function getDaysOfWeek(): string[] {
 }
 
 function getDayOfWeekNumericalValue(dayOfWeekName: string): number {
-  return getDaysOfWeek().indexOf(dayOfWeekName.toLowerCase());
+  return getWeekdayOrder().indexOf(dayOfWeekName.toLowerCase());
 }
 
 export async function createWeeklyNote(date: Moment): Promise<TFile> {
