@@ -5,7 +5,7 @@ import { tryToCreateDailyNote, tryToCreateWeeklyNote } from "src/io/notes";
 import type { ISettings } from "src/settings";
 import { mount, unmount } from "svelte";
 import Calendar from "./components/Calendar.svelte";
-import PeriodicNotesCache from "./components/fileStore";
+import PeriodicNotesCache from "./components/periodic-notes-cache";
 import { showFileMenu } from "./fileMenu";
 import {
   getDateFromFile,

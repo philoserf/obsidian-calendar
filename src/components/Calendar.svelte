@@ -6,7 +6,7 @@
   import type { ISettings } from "src/settings";
   import { activeFile, settings } from "../stores";
   import { DISPLAYED_MONTH } from "./context";
-  import type PeriodicNotesCache from "./fileStore";
+  import type PeriodicNotesCache from "./periodic-notes-cache";
   import Nav from "./Nav.svelte";
   import PeriodicNoteCell from "./PeriodicNoteCell.svelte";
   import type { ICalendarSource, IEventHandlers, IMonth, ISourceSettings } from "./types";

@@ -1,7 +1,7 @@
 import type { TFile } from "obsidian";
 import { defaultSettings, type ISettings } from "src/settings";
 import { writable } from "svelte/store";
-import { getDateUIDFromFile } from "./components/fileStore";
+import { getDateUIDFromFile } from "./components/periodic-notes-cache";
 
 export const settings = writable<ISettings>(defaultSettings);
 

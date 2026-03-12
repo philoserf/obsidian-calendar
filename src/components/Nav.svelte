@@ -4,7 +4,7 @@
   import type { Moment } from "moment";
 
   import Arrow from "./Arrow.svelte";
-  import type PeriodicNotesCache from "./fileStore";
+  import type PeriodicNotesCache from "./periodic-notes-cache";
   import { DISPLAYED_MONTH } from "./context";
   import Dot from "./Dot.svelte";
   import Month from "./Month.svelte";

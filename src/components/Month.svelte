@@ -10,7 +10,7 @@
 
   import { DISPLAYED_MONTH } from "./context";
   import Dots from "./Dots.svelte";
-  import type PeriodicNotesCache from "./fileStore";
+  import type PeriodicNotesCache from "./periodic-notes-cache";
   import MetadataResolver from "./MetadataResolver.svelte";
   import { isMetaPressed } from "./utils";
   import type { IDayMetadata, ISourceSettings } from "./types";

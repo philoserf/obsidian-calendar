@@ -8,7 +8,7 @@
   import Dots from "./Dots.svelte";
   import MetadataResolver from "./MetadataResolver.svelte";
   import { DISPLAYED_MONTH } from "./context";
-  import type PeriodicNotesCache from "./fileStore";
+  import type PeriodicNotesCache from "./periodic-notes-cache";
   import type {
     IDayMetadata,
     ISourceSettings,
