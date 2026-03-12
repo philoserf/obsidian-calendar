@@ -73,12 +73,16 @@
   // Heartbeat: update today every 60s; auto-advance displayed month if the user
   // was viewing the current month when the month boundary crossed.
   const heartbeat = setInterval(() => {
-    const prevToday = today;
-    tick();
-    if (!prevToday.isSame(today, "month")) {
-      if (get(displayedMonthStore).isSame(prevToday, "month")) {
-        displayedMonthStore.set(today);
+    try {
+      const prevToday = today;
+      tick();
+      if (!prevToday.isSame(today, "month")) {
+        if (get(displayedMonthStore).isSame(prevToday, "month")) {
+          displayedMonthStore.set(today);
+        }
       }
+    } catch (err) {
+      console.error("[Calendar] Heartbeat failed", err);
     }
   }, 1000 * 60);
 
