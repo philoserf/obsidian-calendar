@@ -1,6 +1,7 @@
-import { type App, PluginSettingTab, Setting } from "obsidian";
+import { type App, Notice, PluginSettingTab, Setting } from "obsidian";
 import { DEFAULT_WEEK_FORMAT, DEFAULT_WORDS_PER_DOT } from "src/constants";
 import type CalendarPlugin from "./main";
+import { getPluginSettings } from "./obsidian-internals";
 import { appHasDailyNotesPluginLoaded } from "./periodic-notes";
 
 export interface ISettings {
@@ -25,9 +26,10 @@ export const defaultSettings = Object.freeze({
 });
 
 export function appHasPeriodicNotesWeeklyEnabled(): boolean {
-  // biome-ignore lint/suspicious/noExplicitAny: Obsidian API lacks type
-  const periodicNotes = (<any>window.app).plugins.getPlugin("periodic-notes");
-  return !!periodicNotes?.settings?.weekly?.enabled;
+  const periodicNotes = window.app.plugins.getPlugin("periodic-notes");
+  const settings = getPluginSettings(periodicNotes);
+  const weekly = settings?.weekly as Record<string, unknown> | undefined;
+  return !!weekly?.enabled;
 }
 
 export class CalendarSettingsTab extends PluginSettingTab {
@@ -86,11 +88,16 @@ export class CalendarSettingsTab extends PluginSettingTab {
         textfield.inputEl.type = "number";
         textfield.setValue(String(this.plugin.options.wordsPerDot));
         textfield.onChange(async (value) => {
-          const n = Number(value);
-          this.plugin.writeOptions(() => ({
-            wordsPerDot:
-              Number.isFinite(n) && n > 0 ? n : DEFAULT_WORDS_PER_DOT,
-          }));
+          try {
+            const n = Number(value);
+            await this.plugin.writeOptions(() => ({
+              wordsPerDot:
+                Number.isFinite(n) && n > 0 ? n : DEFAULT_WORDS_PER_DOT,
+            }));
+          } catch (err) {
+            console.error("[Calendar] Failed to save settings", err);
+            new Notice("Calendar: failed to save settings.");
+          }
         });
       });
   }
@@ -102,9 +109,14 @@ export class CalendarSettingsTab extends PluginSettingTab {
       .addToggle((toggle) => {
         toggle.setValue(this.plugin.options.shouldConfirmBeforeCreate);
         toggle.onChange(async (value) => {
-          this.plugin.writeOptions(() => ({
-            shouldConfirmBeforeCreate: value,
-          }));
+          try {
+            await this.plugin.writeOptions(() => ({
+              shouldConfirmBeforeCreate: value,
+            }));
+          } catch (err) {
+            console.error("[Calendar] Failed to save settings", err);
+            new Notice("Calendar: failed to save settings.");
+          }
         });
       });
   }
@@ -116,7 +128,12 @@ export class CalendarSettingsTab extends PluginSettingTab {
       .addToggle((toggle) => {
         toggle.setValue(this.plugin.options.showWeeklyNote);
         toggle.onChange(async (value) => {
-          this.plugin.writeOptions(() => ({ showWeeklyNote: value }));
+          try {
+            await this.plugin.writeOptions(() => ({ showWeeklyNote: value }));
+          } catch (err) {
+            console.error("[Calendar] Failed to save settings", err);
+            new Notice("Calendar: failed to save settings.");
+          }
           this.display(); // show/hide weekly settings
         });
       });
@@ -130,7 +147,12 @@ export class CalendarSettingsTab extends PluginSettingTab {
         textfield.setValue(this.plugin.options.weeklyNoteFormat);
         textfield.setPlaceholder(DEFAULT_WEEK_FORMAT);
         textfield.onChange(async (value) => {
-          this.plugin.writeOptions(() => ({ weeklyNoteFormat: value }));
+          try {
+            await this.plugin.writeOptions(() => ({ weeklyNoteFormat: value }));
+          } catch (err) {
+            console.error("[Calendar] Failed to save settings", err);
+            new Notice("Calendar: failed to save settings.");
+          }
         });
       });
   }
@@ -144,7 +166,14 @@ export class CalendarSettingsTab extends PluginSettingTab {
       .addText((textfield) => {
         textfield.setValue(this.plugin.options.weeklyNoteTemplate);
         textfield.onChange(async (value) => {
-          this.plugin.writeOptions(() => ({ weeklyNoteTemplate: value }));
+          try {
+            await this.plugin.writeOptions(() => ({
+              weeklyNoteTemplate: value,
+            }));
+          } catch (err) {
+            console.error("[Calendar] Failed to save settings", err);
+            new Notice("Calendar: failed to save settings.");
+          }
         });
       });
   }
@@ -156,7 +185,12 @@ export class CalendarSettingsTab extends PluginSettingTab {
       .addText((textfield) => {
         textfield.setValue(this.plugin.options.weeklyNoteFolder);
         textfield.onChange(async (value) => {
-          this.plugin.writeOptions(() => ({ weeklyNoteFolder: value }));
+          try {
+            await this.plugin.writeOptions(() => ({ weeklyNoteFolder: value }));
+          } catch (err) {
+            console.error("[Calendar] Failed to save settings", err);
+            new Notice("Calendar: failed to save settings.");
+          }
         });
       });
   }
