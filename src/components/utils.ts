@@ -1,6 +1,6 @@
 import type { Moment } from "moment";
 
-import type { IMonth, IWeek } from "./types";
+import type { IDayMetadata, IHTMLAttributes, IMonth, IWeek } from "./types";
 
 function isMacOS() {
   return navigator.userAgent.includes("Mac");
@@ -49,4 +49,17 @@ export function getMonth(displayedMonth: Moment): IMonth {
   }
 
   return month;
+}
+
+export function getAttributes(metadata: IDayMetadata[]): IHTMLAttributes {
+  if (!metadata) {
+    return {};
+  }
+  const result: IHTMLAttributes = {};
+  for (const meta of metadata) {
+    if (meta.display === "calendar-and-menu" && meta.attrs) {
+      Object.assign(result, meta.attrs);
+    }
+  }
+  return result;
 }

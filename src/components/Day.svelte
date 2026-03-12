@@ -11,10 +11,9 @@
   import type PeriodicNotesCache from "./fileStore";
   import type {
     IDayMetadata,
-    IHTMLAttributes,
     ISourceSettings,
   } from "./types";
-  import { isMetaPressed } from "./utils";
+  import { getAttributes, isMetaPressed } from "./utils";
 
   let {
     date,
@@ -76,20 +75,6 @@
 
   function handleContextmenu(event: MouseEvent) {
     onContextMenu?.("day", date, file, event);
-  }
-
-  function getAttributes(metadata: IDayMetadata[]): IHTMLAttributes {
-    if (!metadata) {
-      return {};
-    }
-    return metadata
-      .filter((meta) => meta.display === "calendar-and-menu")
-      .reduce((acc, meta) => {
-        return {
-          ...acc,
-          ...meta.attrs,
-        };
-      }, {});
   }
 </script>
 
