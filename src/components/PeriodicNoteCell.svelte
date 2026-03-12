@@ -119,25 +119,45 @@
 </td>
 
 <style>
-  .day {
-    background-color: var(--color-background-day);
+  .day,
+  .week-num {
     border-radius: 4px;
-    color: var(--color-text-day);
     cursor: pointer;
-    font-size: 0.8em;
     height: 100%;
     padding: 4px;
-    position: relative;
     text-align: center;
     transition: background-color 0.1s ease-in, color 0.1s ease-in;
     vertical-align: baseline;
   }
-  .day:hover {
+
+  .day {
+    background-color: var(--color-background-day);
+    color: var(--color-text-day);
+    font-size: 0.8em;
+    position: relative;
+  }
+
+  .week-num {
+    background-color: var(--color-background-weeknum);
+    color: var(--color-text-weeknum);
+    font-size: 0.65em;
+  }
+
+  .day:hover,
+  .week-num:hover {
     background-color: var(--interactive-hover);
   }
 
-  .day.active:hover {
+  .day.active:hover,
+  .week-num.active:hover {
     background-color: var(--interactive-accent-hover);
+  }
+
+  .day:active,
+  .active,
+  .active.today {
+    color: var(--text-on-accent);
+    background-color: var(--interactive-accent);
   }
 
   .adjacent-month {
@@ -148,40 +168,7 @@
     color: var(--color-text-today);
   }
 
-  .day:active,
-  .active,
-  .active.today {
-    color: var(--text-on-accent);
-    background-color: var(--interactive-accent);
-  }
-
   .week-num-td {
     border-right: 1px solid var(--background-modifier-border);
-  }
-
-  .week-num {
-    background-color: var(--color-background-weeknum);
-    border-radius: 4px;
-    color: var(--color-text-weeknum);
-    cursor: pointer;
-    font-size: 0.65em;
-    height: 100%;
-    padding: 4px;
-    text-align: center;
-    transition: background-color 0.1s ease-in, color 0.1s ease-in;
-    vertical-align: baseline;
-  }
-
-  .week-num:hover {
-    background-color: var(--interactive-hover);
-  }
-
-  .week-num.active:hover {
-    background-color: var(--interactive-accent-hover);
-  }
-
-  .week-num.active {
-    color: var(--text-on-accent);
-    background-color: var(--interactive-accent);
   }
 </style>

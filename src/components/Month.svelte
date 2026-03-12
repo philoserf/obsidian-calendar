@@ -76,12 +76,16 @@
     }
   }
 
-  function handleClick(event: MouseEvent) {
+  function activateMonth(inNewSplit: boolean) {
     if (monthlyNotesEnabled) {
-      onClick?.("month", $displayedMonth, file, isMetaPressed(event));
+      onClick?.("month", $displayedMonth, file, inNewSplit);
     } else {
       resetDisplayedMonth();
     }
+  }
+
+  function handleClick(event: MouseEvent) {
+    activateMonth(isMetaPressed(event));
   }
 </script>
 
@@ -94,11 +98,7 @@
       onclick={handleClick}
       onkeydown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          if (monthlyNotesEnabled) {
-            onClick?.('month', $displayedMonth, file, false);
-          } else {
-            resetDisplayedMonth();
-          }
+          activateMonth(false);
         }
       }}
       oncontextmenu={metadata &&
