@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { isMobile } from "../obsidian-internals";
+
   let {
     onClick,
     tooltip,
@@ -9,13 +11,13 @@
     direction: "left" | "right";
   } = $props();
 
-  let isMobile = (window.app as any).isMobile;
+  let mobile = isMobile(window.app);
 </script>
 
 <button
   type="button"
   class="arrow"
-  class:is-mobile="{isMobile}"
+  class:is-mobile="{mobile}"
   class:right="{direction === 'right'}"
   onclick="{onClick}"
   aria-label="{tooltip}"

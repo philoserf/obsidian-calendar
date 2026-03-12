@@ -5,7 +5,7 @@
  * surfaces in one place instead of scattered across the codebase.
  */
 
-import type { App, Plugin, Workspace } from "obsidian";
+import type { App, Plugin, TFile, Workspace } from "obsidian";
 
 // -- Internal plugin manager --
 
@@ -45,8 +45,8 @@ export function getPluginOptions(
 // -- Fold manager --
 
 interface FoldManager {
-  load(file: unknown): Record<string, unknown> | null;
-  save(file: unknown, foldInfo: Record<string, unknown>): void;
+  load(file: TFile): Record<string, unknown> | null;
+  save(file: TFile, foldInfo: Record<string, unknown>): void;
 }
 
 export function getFoldManager(app: App): FoldManager {
@@ -57,7 +57,7 @@ export function getFoldManager(app: App): FoldManager {
 // -- Drag manager --
 
 interface DragManager {
-  dragFile(event: DragEvent, file: unknown): unknown;
+  dragFile(event: DragEvent, file: TFile): unknown;
   onDragStart(event: DragEvent, dragData: unknown): void;
 }
 
@@ -86,6 +86,13 @@ export type CalendarWorkspace = Workspace & CustomWorkspaceEvents;
 export function asEventWorkspace(workspace: Workspace): CalendarWorkspace {
   // biome-ignore lint/suspicious/noExplicitAny: Obsidian private API
   return workspace as any as CalendarWorkspace;
+}
+
+// -- App properties --
+
+export function isMobile(app: App): boolean {
+  // biome-ignore lint/suspicious/noExplicitAny: Obsidian private API
+  return !!(app as any).isMobile;
 }
 
 // -- Moment locale internals --
