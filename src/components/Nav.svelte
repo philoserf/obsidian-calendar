@@ -13,11 +13,13 @@
   let {
     getSourceSettings,
     fileCache,
+    monthlyNotesEnabled,
     today,
     eventHandlers,
   }: {
     getSourceSettings: (sourceId: string) => ISourceSettings;
     fileCache: PeriodicNotesCache;
+    monthlyNotesEnabled: boolean;
     today: Moment;
     eventHandlers: IEventHandlers;
   } = $props();
@@ -43,6 +45,7 @@
   <Month
     {fileCache}
     {getSourceSettings}
+    {monthlyNotesEnabled}
     {resetDisplayedMonth}
     {...eventHandlers}
   />

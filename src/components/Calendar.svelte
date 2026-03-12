@@ -4,6 +4,7 @@
   import { get, writable } from "svelte/store";
 
   import type { ISettings } from "src/settings";
+  import { appHasMonthlyNotesPluginLoaded } from "../periodic-notes";
   import { activeFile, settings } from "../stores";
   import { DISPLAYED_MONTH } from "./context";
   import type PeriodicNotesCache from "./periodic-notes-cache";
@@ -40,6 +41,7 @@
   setContext(DISPLAYED_MONTH, displayedMonthStore);
 
   let showWeekNums = $derived($settings.showWeeklyNote);
+  let monthlyNotesEnabled = $derived(appHasMonthlyNotesPluginLoaded());
   let selectedId = $derived($activeFile);
   let eventHandlers: IEventHandlers = $derived({ onHover, onClick, onContextMenu });
 
@@ -93,6 +95,7 @@
 <div id="calendar-container" class="container">
   <Nav
     {fileCache}
+    {monthlyNotesEnabled}
     {today}
     {getSourceSettings}
     {eventHandlers}

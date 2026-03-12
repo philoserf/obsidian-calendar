@@ -3,10 +3,7 @@
   import type { TFile } from "obsidian";
   import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
-  import {
-    appHasMonthlyNotesPluginLoaded,
-    type IGranularity,
-  } from "../periodic-notes";
+  import type { IGranularity } from "../periodic-notes";
 
   import { DISPLAYED_MONTH } from "./context";
   import Dots from "./Dots.svelte";
@@ -18,6 +15,7 @@
   let {
     fileCache,
     getSourceSettings,
+    monthlyNotesEnabled,
     onHover,
     onClick,
     onContextMenu,
@@ -25,6 +23,7 @@
   }: {
     fileCache: PeriodicNotesCache;
     getSourceSettings: (sourceId: string) => ISourceSettings;
+    monthlyNotesEnabled: boolean;
     onHover: (
       periodicity: IGranularity,
       date: Moment,
@@ -67,7 +66,7 @@
   });
 
   function handleHover(event: PointerEvent) {
-    if (!appHasMonthlyNotesPluginLoaded()) {
+    if (!monthlyNotesEnabled) {
       return;
     }
 
@@ -78,7 +77,7 @@
   }
 
   function handleClick(event: MouseEvent) {
-    if (appHasMonthlyNotesPluginLoaded()) {
+    if (monthlyNotesEnabled) {
       onClick?.("month", $displayedMonth, file, isMetaPressed(event));
     } else {
       resetDisplayedMonth();
@@ -95,7 +94,7 @@
       onclick={handleClick}
       onkeydown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          if (appHasMonthlyNotesPluginLoaded()) {
+          if (monthlyNotesEnabled) {
             onClick?.('month', $displayedMonth, file, false);
           } else {
             resetDisplayedMonth();
