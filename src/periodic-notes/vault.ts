@@ -33,8 +33,10 @@ async function ensureFolderExists(path: string): Promise<void> {
   for (const segment of dirs) {
     if (!segment) continue;
     current = current ? `${current}/${segment}` : segment;
-    if (!window.app.vault.getAbstractFileByPath(current)) {
+    try {
       await window.app.vault.createFolder(current);
+    } catch {
+      // Folder already exists — expected when another process created it first
     }
   }
 }
