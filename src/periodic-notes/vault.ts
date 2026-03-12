@@ -2,6 +2,7 @@ import type { Moment } from "moment";
 import { Notice, normalizePath, TFile, TFolder, Vault } from "obsidian";
 import { getFoldManager, getWeekStartDay } from "../obsidian-internals";
 import { getDateFromFile, getDateUID } from "./parse";
+import { getDayOfWeekNumericalValue, join } from "./path";
 import {
   appHasMonthlyNotesPluginLoaded,
   appHasWeeklyNotesPluginLoaded,
@@ -10,21 +11,6 @@ import {
   getWeeklyNoteSettings,
 } from "./settings";
 import type { IGranularity } from "./types";
-
-function join(...partSegments: string[]): string {
-  let parts: string[] = [];
-  for (let i = 0, l = partSegments.length; i < l; i++) {
-    parts = parts.concat(partSegments[i].split("/"));
-  }
-  const newParts: string[] = [];
-  for (let i = 0, l = parts.length; i < l; i++) {
-    const part = parts[i];
-    if (!part || part === ".") continue;
-    newParts.push(part);
-  }
-  if (parts[0] === "") newParts.unshift("");
-  return newParts.join("/");
-}
 
 async function ensureFolderExists(path: string): Promise<void> {
   const dirs = path.replace(/\\/g, "/").split("/");
@@ -134,29 +120,6 @@ export async function createDailyNote(date: Moment): Promise<TFile> {
   }
 }
 
-function getWeekdayOrder(): string[] {
-  let weekStart = getWeekStartDay();
-  const daysOfWeek = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ];
-  while (weekStart) {
-    // biome-ignore lint/style/noNonNullAssertion: array is guaranteed non-empty
-    daysOfWeek.push(daysOfWeek.shift()!);
-    weekStart--;
-  }
-  return daysOfWeek;
-}
-
-function getDayOfWeekNumericalValue(dayOfWeekName: string): number {
-  return getWeekdayOrder().indexOf(dayOfWeekName.toLowerCase());
-}
-
 export async function createWeeklyNote(date: Moment): Promise<TFile> {
   const { vault } = window.app;
   const { template, format, folder } = getWeeklyNoteSettings();
@@ -194,7 +157,10 @@ export async function createWeeklyNote(date: Moment): Promise<TFile> {
         .replace(
           /{{\s*(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\s*:(.*?)}}/gi,
           (_, dayOfWeek, momentFormat) => {
-            const day = getDayOfWeekNumericalValue(dayOfWeek);
+            const day = getDayOfWeekNumericalValue(
+              dayOfWeek,
+              getWeekStartDay(),
+            );
             return date.weekday(day).format(momentFormat.trim());
           },
         ),
